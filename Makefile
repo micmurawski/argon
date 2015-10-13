@@ -1,5 +1,5 @@
-CXX=gcc
-CXXFLAGS=-Wall
+CC=gcc
+CFLAGS=-Wall -pedantic -std=c99
 LFLAGS=-lm
 
 OBJS = argon.o main.o
@@ -7,7 +7,7 @@ OBJS = argon.o main.o
 all: program
 
 program: $(OBJS)
-		$(CXX) $(CXXFLAGS) $^ -o $@
+		$(CC) $(LFLAGS) $(CFLAGS) $^ -o $@
 
 clean:
 		rm -f *.o main

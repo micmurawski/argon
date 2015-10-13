@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
 	printf("INPUT FILE: %s\n", INPUT);
 	printf("OUTPUT FILE: %s\n", OUTPUT);
 
-	n=LoadData(argv[1]);
+	n=loadData(argv[1]);
    printf("liczba atomow: %d\n",n*n*n);
 
 
