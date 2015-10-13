@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int loadData(char *input_file_name){
+void loadData(char *input_file_name,int *data){
 
-	int n;
 	FILE *input_file;
 
 	input_file=fopen(input_file_name,"r");
@@ -15,26 +14,46 @@ int loadData(char *input_file_name){
       exit(EXIT_FAILURE);
    }
  
-   fscanf(input_file, "%d,",&n);
+   fscanf(input_file, "%d,",data);
    fclose(input_file);
-   free(input_file);
 
-   return n;
    
    }
 
- void saveData(char *output_file_name){
+ void saveData(char *output_file_name,double data[][3], int N){
+
+   FILE *output_file;
+
+   output_file=fopen(output_file_name,"w");
+
+    if( output_file == NULL )
+   {
+      perror("Error while opening the file.\n");
+      exit(EXIT_FAILURE);
+   }
+
+   fprintf(output_file, "%d\n", N);
+   for(int i=0;i<N;i++){
+      fprintf(output_file, "atom%d %f %f %f\n",i+1,data[i][0],data[i][1],data[i][2]);
+   }
+   fclose(output_file);
+
 
  }
 
- inline double *addArray(double array1[], double array2[], int n){
+void addArray(double *result,double *array1, double *array2, int n){
 
- 	double *NewArray=(double*)malloc(n * sizeof(double)); 
- 	for(int i=0;i<n;i++){
- 		NewArray[i]=array1[i]+array2[i];
- 	}
+   for(int i=0;i<3;i++){
+      result[i]=array1[i]+array2[i];
+   }
 
- 	return NewArray;
+ }
+
+ void multiplyArray(double *result,double *array1,double number,int n){
+
+   for(int i=0;i<n;i++){
+      result[i]=array1[i]*number;
+   }
 
  }
 
