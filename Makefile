@@ -7,7 +7,7 @@ OBJS = argon.o main.o
 all: program
 
 program: $(OBJS)
-		$(CC) $(LFLAGS) $(CFLAGS) $^ -o $@
+		$(CC) $(CFLAGS) $^ -o $@ $(LFLAGS)
 
 clean:
 		rm -f *.o main

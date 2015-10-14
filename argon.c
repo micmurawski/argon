@@ -57,3 +57,37 @@ void addArray(double *result,double *array1, double *array2, int n){
 
  }
 
+void saveMomentum(char *output_file_name,double data[][3], int N){
+
+   FILE *output_file;
+
+   output_file=fopen(output_file_name,"w");
+
+    if( output_file == NULL )
+   {
+      perror("Error while opening the file.\n");
+      exit(EXIT_FAILURE);
+   }
+
+   for(int i=0;i<N;i++){
+      fprintf(output_file, "%f \t %f \t %f\n",data[i][0],data[i][1],data[i][2]);
+   }
+   fclose(output_file);
+
+
+}
+
+double dotProduct(double *array1,double *array2, int n){
+   double result;
+   for(int i=0;i<n;i++){
+      result+=array1[i]*array2[i];
+   }
+   return result;
+}
+
+double subtractArray(double *result,double *array1,double *array2, int n){
+   
+   for(int i=0;i<n;i++){
+      result[i]=array1[i]-array2[i];
+   }
+}
