@@ -4,26 +4,31 @@
 #include <math.h>
 #include <time.h>
 
+#define Parameters struct Parameters
 #define INPUT	argv[1]
 #define OUTPUT	argv[2]
 #define PI 3.1415926535
 #define K   8.31e-3
+#define T0 doubleParam[6]
+#define n intParam[0]
+#define A doubleParam[5]
+#define M doubleParam[0]
+#define EPS doubleParam[1]
+#define R doubleParam[2]
+
 
 
 
 int main(int argc, char *argv[]){
 
-const double A=1;
-const double M=1;
-const double T0=100;
-const double EPS=1;
-const double R=1;
+int intParam[5];
+double doubleParam[8];
 
 const double b0[3]= {A,0,0};
 const double b1[3]= {A/2,A*sqrt(3)/2,0};
 const double b2[3]= {A/2,A*sqrt(3)/6,A*sqrt(2.0/3.0)};
 
-int n,i0,i1,i2,i;
+int i0,i1,i2,i;
 float random_number;
 double averageP[3]={0,0,0};
 double v0[3]={0,0,0};
@@ -33,7 +38,7 @@ srand(time(NULL));
 	
 	printf("INPUT FILE: %s\n", INPUT);
 	printf("OUTPUT FILE: %s\n", OUTPUT);
-	loadData(INPUT,&n);
+	loadData(INPUT,intParam,doubleParam);
 
 	const int N=n*n*n;
 	double r[N][3],p[N][3],V[N][3];

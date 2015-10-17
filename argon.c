@@ -1,8 +1,13 @@
 #include "argon.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-void loadData(char *input_file_name,int *data){
+
+
+
+
+void loadData(char *input_file_name,int intParam[],double doubleParam[]){
 
 	FILE *input_file;
 
@@ -14,7 +19,19 @@ void loadData(char *input_file_name,int *data){
       exit(EXIT_FAILURE);
    }
  
-   fscanf(input_file, "%d,",data);
+   fscanf(input_file, "%d,",&intParam[0]);
+   fscanf(input_file, "%lf,",&doubleParam[0]);
+   fscanf(input_file, "%lf,",&doubleParam[1]);
+   fscanf(input_file, "%lf,",&doubleParam[2]);
+   fscanf(input_file, "%lf,",&doubleParam[3]);
+   fscanf(input_file, "%lf,",&doubleParam[4]);
+   fscanf(input_file, "%lf,",&doubleParam[5]);
+   fscanf(input_file, "%lf,",&doubleParam[6]);
+   fscanf(input_file, "%lf,",&doubleParam[7]);
+   fscanf(input_file, "%d,",&intParam[1]);
+   fscanf(input_file, "%d,",&intParam[2]);
+   fscanf(input_file, "%d,",&intParam[3]);
+   fscanf(input_file, "%d,",&intParam[4]);
    fclose(input_file);
 
    
@@ -85,9 +102,44 @@ double dotProduct(double *array1,double *array2, int n){
    return result;
 }
 
-double subtractArray(double *result,double *array1,double *array2, int n){
+double Norm(double *array1,int n){
+   double result;
+   for(int i=0;i<n;i++) result+=array1[i]*array1[i];
+   return result;
+}
+
+
+void subtractArray(double *result,double *array1,double *array2, int n){
    
    for(int i=0;i<n;i++){
       result[i]=array1[i]-array2[i];
    }
+}
+
+double calculatePotential(double *array1, double *array2, int n, double eps, double R){
+
+   double r;
+   for(int i=0;i<n;i++){
+      r+=pow(array1[i]-array2[i],2);
+   }
+   r=sqrt(r);
+
+   return eps*(pow(R/r,12)-2*pow(R/r,6));
+
+}
+
+void calculateForce(double *result, double *array1, double *array2, int n, double eps, double R){
+
+   double r;
+   for(int i=0;i<n;i++){
+      r+=pow(array1[i]-array2[i],2);
+   }
+   r=sqrt(r);
+
+   subtractArray(result,array1,array2,n);
+
+   multiplyArray(result,result,
+      12*eps*(pow(R/r,12)-pow(R/r,6))/(r*r),
+      3);
+
 }
