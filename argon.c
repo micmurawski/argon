@@ -50,13 +50,23 @@ void loadData(char *input_file_name,int intParam[],double doubleParam[]){
    }
 
    fprintf(output_file, "%d\n", N);
+   fprintf(output_file, "comment\n");
    for(int i=0;i<N;i++){
-      fprintf(output_file, "atom%d %f %f %f\n",i+1,data[i][0],data[i][1],data[i][2]);
+      fprintf(output_file, "atom%d\t%f\t%f\t%f\n",i,data[i][0],data[i][1],data[i][2]);
    }
    fclose(output_file);
 
 
  }
+
+
+void savePositions(FILE *output_file,double data[][3],int N){
+
+   for(int i=0;i<N;i++){
+      fprintf(output_file, "atom%d\t%f\t%f\t%f\n",i,data[i][0],data[i][1],data[i][2]);
+   }
+
+}
 
 void addArray(double *result,double *array1, double *array2, int n){
 
@@ -116,7 +126,7 @@ void subtractArray(double *result,double *array1,double *array2, int n){
    }
 }
 
-double calculatePotential(double *array1, double *array2, int n, double eps, double R){
+double calculatePotential(double *array1, double *array2, int n, double eps, double R,double L,double f){
 
    double r;
    for(int i=0;i<n;i++){
@@ -124,11 +134,17 @@ double calculatePotential(double *array1, double *array2, int n, double eps, dou
    }
    r=sqrt(r);
 
-   return eps*(pow(R/r,12)-2*pow(R/r,6));
+   if(r<L){
+      return eps*(pow(R/r,12)-2*pow(R/r,6));
+   }
+   else
+   {
+      return eps*(pow(R/r,12)-2*pow(R/r,6))+f*pow((r-L),2)/2;
+   }
 
 }
 
-void calculateForce(double *result, double *array1, double *array2, int n, double eps, double R){
+void calculateForce(double *result, double *array1, double *array2, int n, double eps, double R, double L,double f){
 
    double r;
    for(int i=0;i<n;i++){
@@ -137,9 +153,15 @@ void calculateForce(double *result, double *array1, double *array2, int n, doubl
    r=sqrt(r);
 
    subtractArray(result,array1,array2,n);
-
+   if(r<L){
    multiplyArray(result,result,
       12*eps*(pow(R/r,12)-pow(R/r,6))/(r*r),
       3);
+}else{
+   multiplyArray(result,result,
+      (12*eps*(pow(R/r,12)-pow(R/r,6))/(r*r))+f*(r-L)/r,
+      3);
+
+}
 
 }

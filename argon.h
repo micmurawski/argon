@@ -1,5 +1,6 @@
 #ifndef _argon_h_
 #define _argon_h_
+#include <stdio.h>
 
 
 void loadData(char *input_file_name,int intParam[],double doubleParam[]);
@@ -10,8 +11,9 @@ void saveMomentum(char *output_file_name,double data[][3], int N);
 double dotProduct(double *array1,double *array2, int n);
 double Norm(double *array1,int n);
 void subtractArray(double *result,double *array1,double *array2, int n);
-double calculatePotential(double *array1, double *array2, int n, double eps, double R);
-void calculateForce(double *result, double *array1, double *array2, int n, double eps, double R);
+double calculatePotential(double *array1, double *array2, int n, double eps, double R,double L,double f);
+void calculateForce(double *result, double *array1, double *array2, int n, double eps, double R,double L,double f);
+void savePositions(FILE *output_file,double data[][3],int N);
 
 
 #endif
