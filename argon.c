@@ -7,11 +7,11 @@
 
 
 
-void loadData(char *input_file_name,int intParam[],double doubleParam[]){
+inline void loadData(char *input_file_name,int intParam[],double doubleParam[]){
 
-	FILE *input_file;
+   FILE *input_file;
 
-	input_file=fopen(input_file_name,"r");
+   input_file=fopen(input_file_name,"r");
   
     if( input_file == NULL )
    {
@@ -37,7 +37,7 @@ void loadData(char *input_file_name,int intParam[],double doubleParam[]){
    
    }
 
- void saveData(char *output_file_name,double data[][3], int N){
+ inline void saveData(char *output_file_name,double data[][3], int N){
 
    FILE *output_file;
 
@@ -60,31 +60,17 @@ void loadData(char *input_file_name,int intParam[],double doubleParam[]){
  }
 
 
-void savePositions(FILE *output_file,double data[][3],int N){
+inline void savePositions(FILE *output_file,double data[][3],int N){
 
    for(int i=0;i<N;i++){
       fprintf(output_file, "atom%d\t%f\t%f\t%f\n",i,data[i][0],data[i][1],data[i][2]);
    }
+   fprintf(output_file, "\n");
 
 }
 
-void addArray(double *result,double *array1, double *array2, int n){
 
-   for(int i=0;i<3;i++){
-      result[i]=array1[i]+array2[i];
-   }
-
- }
-
- void multiplyArray(double *result,double *array1,double number,int n){
-
-   for(int i=0;i<n;i++){
-      result[i]=array1[i]*number;
-   }
-
- }
-
-void saveMomentum(char *output_file_name,double data[][3], int N){
+inline void saveMomentum(char *output_file_name,double data[][3], int N){
 
    FILE *output_file;
 
@@ -104,64 +90,34 @@ void saveMomentum(char *output_file_name,double data[][3], int N){
 
 }
 
-double dotProduct(double *array1,double *array2, int n){
+
+inline double distance(double *array1,double *array2, int n){
    double result;
-   for(int i=0;i<n;i++){
-      result+=array1[i]*array2[i];
-   }
+   for(int i;i<n;i++) result+=(array1[i]-array2[i])*(array1[i]-array2[i]);
+   return sqrt(result);
+}
+
+inline double temperature(double data[][3], double mass,double k, int n){
+   double T=0;
+   for(int i=0;i<n;i++) T+=((data[i][0]*data[i][0])+(data[i][1]*data[i][1])+(data[i][2]*data[i][2]));
+   T/=(3.0*k*n*mass);
+   return T;
+}
+
+inline double pressure(double data[][3], double L, int N){
+   double result;
+   for(int i;i<N;i++)result+=sqrt((data[i][0]*data[i][0])+(data[i][1]*data[i][1])+(data[i][2]*data[i][2]));
+   return result/(4*3.1415926535*L*L);
+}
+
+inline double sum(double data[], int N){
+   double result;
+   for (int i;i<N;i++) result+=data[i];
    return result;
 }
 
-double Norm(double *array1,int n){
-   double result;
-   for(int i=0;i<n;i++) result+=array1[i]*array1[i];
-   return result;
-}
-
-
-void subtractArray(double *result,double *array1,double *array2, int n){
-   
-   for(int i=0;i<n;i++){
-      result[i]=array1[i]-array2[i];
-   }
-}
-
-double calculatePotential(double *array1, double *array2, int n, double eps, double R,double L,double f){
-
-   double r;
-   for(int i=0;i<n;i++){
-      r+=pow(array1[i]-array2[i],2);
-   }
-   r=sqrt(r);
-
-   if(r<L){
-      return eps*(pow(R/r,12)-2*pow(R/r,6));
-   }
-   else
-   {
-      return eps*(pow(R/r,12)-2*pow(R/r,6))+f*pow((r-L),2)/2;
-   }
-
-}
-
-void calculateForce(double *result, double *array1, double *array2, int n, double eps, double R, double L,double f){
-
-   double r;
-   for(int i=0;i<n;i++){
-      r+=pow(array1[i]-array2[i],2);
-   }
-   r=sqrt(r);
-
-   subtractArray(result,array1,array2,n);
-   if(r<L){
-   multiplyArray(result,result,
-      12*eps*(pow(R/r,12)-pow(R/r,6))/(r*r),
-      3);
-}else{
-   multiplyArray(result,result,
-      (12*eps*(pow(R/r,12)-pow(R/r,6))/(r*r))+f*(r-L)/r,
-      3);
-
-}
-
+inline double kineticEnergy(double data[][3],double mass, int N){
+   double result=0;
+   for(int i=0;i<N;i++)result+=((data[i][0]*data[i][0])+(data[i][1]*data[i][1])+(data[i][2]*data[i][2]));
+   return result/(2*mass);
 }
