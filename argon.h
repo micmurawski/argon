@@ -2,16 +2,29 @@
 #define _argon_h_
 #include <stdio.h>
 
+struct Parameters{
 
-extern void loadData(char *input_file_name,int intParam[],double doubleParam[]);
+	int n;
+	double m;
+	double eps;
+	double R;
+	double f;
+	double L;
+	double A;
+	double T;
+	double TAU;
+	int s_0;
+	int s_d;
+	int s_out;
+	int s_xyz;
+};
+
+extern void loadData(char *input_file_name,struct Parameters *p);
 extern void saveData(char *output_file_name, double data[][3],int N);
-extern void saveMomentum(char *output_file_name,double data[][3], int N);
-extern void savePositions(FILE *output_file,double data[][3],int N);
-extern double distance(double *array1,double *array2, int n);
-extern double pressure(double data[][3], double L, int N);
-extern double sum(double data[], int N);
 
-extern double temperature(double data[][3],double mass,double k, int n);
-extern double kineticEnergy(double data[][3],double mass, int N);
+extern double pressure(double *px,double *py,double *pz, double L, int N);
+extern double temperature(double *px,double *py,double *pz,double mass,double k, int n);
+extern double kineticEnergy(double *px,double *py,double *pz,double mass, int N);
+extern double sumArray(double *v,int N);
 
 #endif
