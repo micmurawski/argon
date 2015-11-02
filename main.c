@@ -31,14 +31,15 @@ int main(int argc, char *argv[]){
 //if(strcmp(argv[2],"-")!=0){
 //  FILE *output_file;
 //}
+FILE *output_xyz_file;
 
 struct Parameters parameters;
 loadData(INPUT,&parameters);
-FILE *output_xyz_file;
-
 double rji,rj;
-int i0,i1,i2,i;
+double apx,apy,apz;
+double sumT,sumK,sumV;
 double random_number;
+int i0,i1,i2,i;
 const int N=n*n*n;
 
 double* px = (double *)malloc(N*sizeof(double));
@@ -49,18 +50,16 @@ double* Fx = (double *)calloc(N,sizeof(double));
 double* Fy = (double *)calloc(N,sizeof(double));
 double* Fz = (double *)calloc(N,sizeof(double));
 
-double* rx = (double *)calloc(N,sizeof(double));
-double* ry = (double *)calloc(N,sizeof(double));
-double* rz = (double *)calloc(N,sizeof(double));
+double* x = (double *)calloc(N,sizeof(double));
+double* y = (double *)calloc(N,sizeof(double));
+double* z = (double *)calloc(N,sizeof(double));
 
 double* V = (double *)calloc(N,sizeof(double));
 
 srand(time(NULL));
    
-
    printf("INPUT FILE: %s\n", INPUT);
    printf("OUTPUT FILE:%s\n", OUTPUT_xyz);
-
    printf("ATOM NUMBER:%d\n",N);
    printf("ATOM MASS:  %f u\n",M);
    printf("EPS:        %f KJ/mol\n",EPS);
@@ -83,22 +82,20 @@ srand(time(NULL));
 
             i=i0+i1*n+i2*n*n;
 
-            rx[i]+=(double)(i0-(n-1)/2)*A;
+            x[i]+=(double)(i0-(n-1)/2)*A;
 
-            rx[i]+=(double)(i1-(n-1)/2)*A/2;
-            ry[i]+=(double)(i1-(n-1)/2)*A*sqrt(3)/2;
+            x[i]+=(double)(i1-(n-1)/2)*A/2;
+            y[i]+=(double)(i1-(n-1)/2)*A*sqrt(3)/2;
             
-            rx[i]+=(double)(i2-(n-1)/2)*A/2;
-            ry[i]+=(double)(i2-(n-1)/2)*A*sqrt(3)/6;
-            rz[i]+=(double)(i2-(n-1)/2)*A*sqrt(2.0/3.0);
+            x[i]+=(double)(i2-(n-1)/2)*A/2;
+            y[i]+=(double)(i2-(n-1)/2)*A*sqrt(3)/6;
+            z[i]+=(double)(i2-(n-1)/2)*A*sqrt(2.0/3.0);
 
          }
          
       }
             }
 
-
-  
    output_xyz_file=fopen(OUTPUT_xyz,"w");
 
     if( output_xyz_file == NULL )
@@ -127,9 +124,9 @@ srand(time(NULL));
 
    }
 
-    double apx=sumArray(px,N)/N;
-    double apy=sumArray(py,N)/N;
-    double apz=sumArray(pz,N)/N;
+    apx=sumArray(px,N)/N;
+    apy=sumArray(py,N)/N;
+    apz=sumArray(pz,N)/N;
 
    for(int ii=0;ii<N;ii++){
     px[ii]-=apx;
@@ -143,40 +140,37 @@ srand(time(NULL));
    // Rji=|Rj-Ri|
     if(ii!=jj){
 
-   rji=(rx[jj]-rx[ii])*(rx[jj]-rx[ii]);
-   rji+=(ry[jj]-ry[ii])*(ry[jj]-ry[ii]);
-   rji+=(rz[jj]-rz[ii])*(rz[jj]-rz[ii]);
+   rji=(x[jj]-x[ii])*(x[jj]-x[ii]);
+   rji+=(y[jj]-y[ii])*(y[jj]-y[ii]);
+   rji+=(z[jj]-z[ii])*(z[jj]-z[ii]);
    rji=sqrt(rji);
 
    V[jj]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    V[ii]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    
-   Fx[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-   Fy[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-   Fz[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
+   Fx[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
+   Fy[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
+   Fz[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
 
-   Fx[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-   Fy[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-   Fz[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
+   Fx[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
+   Fy[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
+   Fz[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
 
 
 }
  }
 
-   rj=rx[jj]*rx[jj];
-   rj+=ry[jj]*ry[jj];
-   rj+=rz[jj]*rz[jj];
+   rj=x[jj]*x[jj];
+   rj+=y[jj]*y[jj];
+   rj+=z[jj]*z[jj];
    rj=sqrt(rj);
 
    if(rj>=L){
 
   V[jj]+=0.5*f*(rj-L)*(rj-L);
-
-   Fx[jj]+=f*(L-rj)*rx[jj]/rj;
-
-   Fy[jj]+=f*(L-rj)*ry[jj]/rj;
-
-   Fz[jj]+=f*(L-rj)*rz[jj]/rj;
+   Fx[jj]+=f*(L-rj)*x[jj]/rj;
+   Fy[jj]+=f*(L-rj)*y[jj]/rj;
+   Fz[jj]+=f*(L-rj)*z[jj]/rj;
 
    }
 
@@ -199,9 +193,9 @@ srand(time(NULL));
   py[ii]+=0.5*Fy[ii]*TAU;
   pz[ii]+=0.5*Fz[ii]*TAU;
 
-  rx[ii]+=px[ii]*TAU/M;
-  ry[ii]+=py[ii]*TAU/M;
-  rz[ii]+=pz[ii]*TAU/M;
+  x[ii]+=px[ii]*TAU/M;
+  y[ii]+=py[ii]*TAU/M;
+  z[ii]+=pz[ii]*TAU/M;
 }
 
   memset(Fy,0,sizeof(double)*N);
@@ -215,37 +209,37 @@ srand(time(NULL));
    // Rji=|Rj-Ri|
     if(ii!=jj){
 
-   rji=(rx[jj]-rx[ii])*(rx[jj]-rx[ii]);
-   rji+=(ry[jj]-ry[ii])*(ry[jj]-ry[ii]);
-   rji+=(rz[jj]-rz[ii])*(rz[jj]-rz[ii]);
+   rji=(x[jj]-x[ii])*(x[jj]-x[ii]);
+   rji+=(y[jj]-y[ii])*(y[jj]-y[ii]);
+   rji+=(z[jj]-z[ii])*(z[jj]-z[ii]);
    rji=sqrt(rji);
 
    V[jj]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    V[ii]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    
-   Fx[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-   Fy[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-   Fz[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
+   Fx[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
+   Fy[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
+   Fz[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
 
-   Fx[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-   Fy[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-   Fz[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
+   Fx[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
+   Fy[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
+   Fz[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
 
 
 }
  }
 
-   rj=rx[jj]*rx[jj];
-   rj+=ry[jj]*ry[jj];
-   rj+=rz[jj]*rz[jj];
+   rj=x[jj]*x[jj];
+   rj+=y[jj]*y[jj];
+   rj+=z[jj]*z[jj];
    rj=sqrt(rj);
 
    if(rj>=L){
 
    V[jj]+=0.5*f*(rj-L)*(rj-L);
-   Fx[jj]+=f*(L-rj)*rx[jj]/rj;
-   Fy[jj]+=f*(L-rj)*ry[jj]/rj;
-   Fz[jj]+=f*(L-rj)*rz[jj]/rj;
+   Fx[jj]+=f*(L-rj)*x[jj]/rj;
+   Fy[jj]+=f*(L-rj)*y[jj]/rj;
+   Fz[jj]+=f*(L-rj)*z[jj]/rj;
 
    }
 
@@ -264,15 +258,14 @@ srand(time(NULL));
    fprintf(output_xyz_file, "ss=%d\n",ss);
 //ZAPISANIE POZYCJI W FUNKCJI KROKU CZASOWEGO
 
-  for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%f\t%f\t%f\n",i,rx[i],ry[i],rz[i]);
+  for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%f\t%f\t%f\n",i,x[i],y[i],z[i]);
 
   printf("%d ",ss);
   printf("%f ",temperature(px,py,pz,M,K,N));
+  printf("%f ",kineticEnergy(px,py,pz,M,N));
   printf("%f ",sumArray(V,N));
   printf("%f ",kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
   printf("%f \n",pressure(px,py,pz,L,N));
-
-   
 
 }
     
@@ -284,9 +277,9 @@ srand(time(NULL));
     free(py);
     free(pz);
 
-    free(rx);
-    free(ry);
-    free(rz);
+    free(x);
+    free(y);
+    free(z);
 
     fclose(output_xyz_file);
 

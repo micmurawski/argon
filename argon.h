@@ -21,7 +21,6 @@ struct Parameters{
 
 extern void loadData(char *input_file_name,struct Parameters *p);
 extern void saveData(char *output_file_name, double data[][3],int N);
-
 extern double pressure(double *px,double *py,double *pz, double L, int N);
 extern double temperature(double *px,double *py,double *pz,double mass,double k, int n);
 extern double kineticEnergy(double *px,double *py,double *pz,double mass, int N);
