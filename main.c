@@ -5,7 +5,6 @@
 #include <time.h>
 #include <string.h>
 
-//#define Parameters struct Parameters
 #define INPUT  argv[1]
 #define OUTPUT argv[2]
 #define OUTPUT_xyz argv[3]
@@ -26,8 +25,6 @@
 #define s_d parameters.s_d
 #define s_out parameters.s_out
 #define s_xyz parameters.s_xyz
-
-
 
 int main(int argc, char *argv[]){
 
@@ -62,16 +59,22 @@ srand(time(NULL));
    
 
    printf("INPUT FILE: %s\n", INPUT);
-   printf("OUTPUT FILE: %s\n", OUTPUT_xyz);
-   printf("ATOM NUMBER: %d\n",N);
-   printf("TEMPERATURE: %f\n",T0);
-   printf("A:           %f\n",A);
-   printf("ATOM MASS:   %f\n",M);
-   printf("EPS:         %f\n",EPS);
-   printf("R:           %f\n",R);
-   printf("TAU:           %f\n",TAU);
-   printf("f:           %f\n",f);
-   printf("L:           %f\n",L);
+   printf("OUTPUT FILE:%s\n", OUTPUT_xyz);
+
+   printf("ATOM NUMBER:%d\n",N);
+   printf("ATOM MASS:  %f u\n",M);
+   printf("EPS:        %f KJ/mol\n",EPS);
+   printf("R:          %f nm\n",R);
+   printf("f:          %f\n",f);
+   printf("L:          %f nm\n",L);
+   printf("A:          %f nm\n",A);
+   printf("T:          %f K\n",T0);
+   printf("TAU:        %f ps\n",TAU);
+   printf("S_0:        %d\n",s_0);
+   printf("S_D:        %d\n",s_d);
+   printf("S_OUT:      %d\n",s_out);
+   printf("S_XYZ:      %d\n",s_xyz);
+   
 
 //generating initial positions of atoms
    for(i0=0;i0<n;i0++){
@@ -124,26 +127,17 @@ srand(time(NULL));
 
    }
 
-   double apx=sumArray(px,N)/N;
-   double apy=sumArray(py,N)/N;
-   double apz=sumArray(pz,N)/N;
+    double apx=sumArray(px,N)/N;
+    double apy=sumArray(py,N)/N;
+    double apz=sumArray(pz,N)/N;
+
    for(int ii=0;ii<N;ii++){
     px[ii]-=apx;
     py[ii]-=apy;
     pz[ii]-=apz;
    }
 
-   printf("AVERAGE MOMENTUM %f %f %f\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
-   printf("CALCULATED TEMPERATURE %f \n", temperature(px,py,pz,M,K,N) );
-   printf("CALCULATED KIN ENERGY %f \n", kineticEnergy(px,py,pz,M,N) );
-   getchar();
-
-   
-   fprintf(output_xyz_file, "%d\n",N);
-   fprintf(output_xyz_file, "ss=%d\n",0);
-   for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%f\t%f\t%f\n",i,rx[i],ry[i],rz[i]);
-
-    for(int jj=0;jj<N;jj++){
+   for(int jj=0;jj<N;jj++){
    for(int ii=jj;ii<N;ii++){
    
    // Rji=|Rj-Ri|
@@ -154,22 +148,15 @@ srand(time(NULL));
    rji+=(rz[jj]-rz[ii])*(rz[jj]-rz[ii]);
    rji=sqrt(rji);
 
-
    V[jj]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    V[ii]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    
-
-
    Fx[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-
    Fy[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-
    Fz[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
 
    Fx[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-
    Fy[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-
    Fz[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
 
 
@@ -195,23 +182,32 @@ srand(time(NULL));
 
    }
 
+   printf("AVERAGE MOMENTUM %f %f %f\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
+   printf("CALCULATED TEMPERATURE %f \n", temperature(px,py,pz,M,K,N) );
+   printf("CALCULATED KIN ENERGY %f \n", kineticEnergy(px,py,pz,M,N) );
+   printf("CALCULATED POT ENERGY %f \n", sumArray(V,N));
+   printf("CALCULATED TOTAL ENERGY %f \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
+   printf("CALCULATED PRESSURE %f \n", pressure(px,py,pz,L,N));
+   getchar();
+   
 
    //ILOSC KROKOW
    for(int ss=0;ss<2000;ss++){
 
   for(int ii=0;ii<N;ii++){
+  px[ii]+=0.5*Fx[ii]*TAU;
+  py[ii]+=0.5*Fy[ii]*TAU;
+  pz[ii]+=0.5*Fz[ii]*TAU;
 
-   px[ii]+=0.5*Fx[ii]*TAU;
-   py[ii]+=0.5*Fy[ii]*TAU;
-   pz[ii]+=0.5*Fz[ii]*TAU;
-
-   rx[ii]+=px[ii]*TAU/M;
-   ry[ii]+=py[ii]*TAU/M;
-   rz[ii]+=pz[ii]*TAU/M;
-
+  rx[ii]+=px[ii]*TAU/M;
+  ry[ii]+=py[ii]*TAU/M;
+  rz[ii]+=pz[ii]*TAU/M;
 }
 
-
+  memset(Fy,0,sizeof(double)*N);
+  memset(Fx,0,sizeof(double)*N);
+  memset(Fz,0,sizeof(double)*N);
+  memset(V,0,sizeof(double)*N);
 
    for(int jj=0;jj<N;jj++){
    for(int ii=jj;ii<N;ii++){
@@ -224,22 +220,15 @@ srand(time(NULL));
    rji+=(rz[jj]-rz[ii])*(rz[jj]-rz[ii]);
    rji=sqrt(rji);
 
-
    V[jj]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    V[ii]+=EPS*(pow(R/rji,12)-2*pow(R/rji,6));
    
-
-
    Fx[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-
    Fy[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-
    Fz[jj]+=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
 
    Fx[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rx[jj]-rx[ii])/(rji*rji);
-
    Fy[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(ry[jj]-ry[ii])/(rji*rji);
-
    Fz[ii]-=12*EPS*(pow(R/rji,12)-pow(R/rji,6))*(rz[jj]-rz[ii])/(rji*rji);
 
 
@@ -253,12 +242,9 @@ srand(time(NULL));
 
    if(rj>=L){
 
-  V[jj]+=0.5*f*(rj-L)*(rj-L);
-
+   V[jj]+=0.5*f*(rj-L)*(rj-L);
    Fx[jj]+=f*(L-rj)*rx[jj]/rj;
-
    Fy[jj]+=f*(L-rj)*ry[jj]/rj;
-
    Fz[jj]+=f*(L-rj)*rz[jj]/rj;
 
    }
@@ -274,32 +260,17 @@ srand(time(NULL));
 
 //OBLICZENIE NOWYCH PEDOW I NOWYCH POLOZEN
 
-
-//for(int k=0; k)
-  memset(Fy,0,sizeof(double)*N);
-  memset(Fx,0,sizeof(double)*N);
-  memset(Fz,0,sizeof(double)*N);
-  
-
-  //printf("kasujemy!\n");
-  //for(int ii=0;ii<N;ii++)printf("%f %f %f \n",Fx[ii],Fy[ii],Fz[ii]);
-
    fprintf(output_xyz_file, "%d\n",N);
    fprintf(output_xyz_file, "ss=%d\n",ss);
 //ZAPISANIE POZYCJI W FUNKCJI KROKU CZASOWEGO
 
   for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%f\t%f\t%f\n",i,rx[i],ry[i],rz[i]);
-  //for(int i=0;i<N;i++)printf("%f \n",V[i]);
 
   printf("%d ",ss);
   printf("%f ",temperature(px,py,pz,M,K,N));
   printf("%f ",sumArray(V,N));
-  printf("%f \n",kineticEnergy(px,py,pz,M,N));
-  memset(V,0,sizeof(double)*N);
-   //for(int i=0;i<N;i++)printf("%f\n",V[i]);
-
-  
-
+  printf("%f ",kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
+  printf("%f \n",pressure(px,py,pz,L,N));
 
    
 
