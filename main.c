@@ -35,40 +35,40 @@ FILE *output_xyz_file;
 
 struct Parameters parameters;
 loadData(INPUT,&parameters);
-long double rji,rj;
-long double apx,apy,apz;
-long double sumT=0,sumK=0,sumV=0,sumP=0;
-long double random_number;
+double rji,rj;
+double apx,apy,apz;
+double sumT=0,sumK=0,sumV=0,sumP=0;
+double random_number;
 int i0,i1,i2,i;
 const int N=n*n*n;
 
-long double* px = (long double *)malloc(N*sizeof(long double));
-long double* py = (long double *)malloc(N*sizeof(long double));
-long double* pz = (long double *)malloc(N*sizeof(long double));
+double* px = (double *)malloc(N*sizeof(double));
+double* py = (double *)malloc(N*sizeof(double));
+double* pz = (double *)malloc(N*sizeof(double));
 
-long double* Fx = (long double *)calloc(N,sizeof(long double));
-long double* Fy = (long double *)calloc(N,sizeof(long double));
-long double* Fz = (long double *)calloc(N,sizeof(long double));
+double* Fx = (double *)calloc(N,sizeof(double));
+double* Fy = (double *)calloc(N,sizeof(double));
+double* Fz = (double *)calloc(N,sizeof(double));
 
-long double* x = (long double *)calloc(N,sizeof(long double));
-long double* y = (long double *)calloc(N,sizeof(long double));
-long double* z = (long double *)calloc(N,sizeof(long double));
+double* x = (double *)calloc(N,sizeof(double));
+double* y = (double *)calloc(N,sizeof(double));
+double* z = (double *)calloc(N,sizeof(double));
 
-long double* V = (long double *)calloc(N,sizeof(long double));
+double* V = (double *)calloc(N,sizeof(double));
 
 srand(time(NULL));
    
    printf("INPUT FILE: %s\n", INPUT);
    printf("OUTPUT FILE:%s\n", OUTPUT_xyz);
    printf("ATOM NUMBER:%d\n",N);
-   printf("ATOM MASS:  %Lf u\n",M);
-   printf("EPS:        %Lf KJ/mol\n",EPS);
-   printf("R:          %Lf nm\n",R);
-   printf("f:          %Lf\n",f);
-   printf("L:          %Lf nm\n",L);
-   printf("A:          %Lf nm\n",A);
-   printf("T:          %Lf K\n",T0);
-   printf("TAU:        %Lf ps\n",TAU);
+   printf("ATOM MASS:  %lf u\n",M);
+   printf("EPS:        %lf KJ/mol\n",EPS);
+   printf("R:          %lf nm\n",R);
+   printf("f:          %lf\n",f);
+   printf("L:          %lf nm\n",L);
+   printf("A:          %lf nm\n",A);
+   printf("T:          %lf K\n",T0);
+   printf("TAU:        %lf ps\n",TAU);
    printf("S_0:        %d\n",s_0);
    printf("S_D:        %d\n",s_d);
    printf("S_OUT:      %d\n",s_out);
@@ -82,14 +82,14 @@ srand(time(NULL));
 
             i=i0+i1*n+i2*n*n;
 
-            x[i]+=(long double)(i0-(n-1)/2)*A;
+            x[i]+=(double)(i0-(n-1)/2)*A;
 
-            x[i]+=(long double)(i1-(n-1)/2)*A/2;
-            y[i]+=(long double)(i1-(n-1)/2)*A*sqrtl(3)/2;
+            x[i]+=(double)(i1-(n-1)/2)*A/2;
+            y[i]+=(double)(i1-(n-1)/2)*A*sqrt(3)/2;
             
-            x[i]+=(long double)(i2-(n-1)/2)*A/2;
-            y[i]+=(long double)(i2-(n-1)/2)*A*sqrtl(3)/6;
-            z[i]+=(long double)(i2-(n-1)/2)*A*sqrtl(2.0/3.0);
+            x[i]+=(double)(i2-(n-1)/2)*A/2;
+            y[i]+=(double)(i2-(n-1)/2)*A*sqrt(3)/6;
+            z[i]+=(double)(i2-(n-1)/2)*A*sqrt(2.0/3.0);
 
          }
          
@@ -106,20 +106,20 @@ srand(time(NULL));
 
    for(int ii=0;ii<N;ii++){
      
-     random_number=(((long double)rand()+1)/((long double)RAND_MAX+1)); //  random number (0;1]
-     px[ii]=sqrtl(-2*K*T0*M*logl(random_number)); // generating initial momentum form maxwell-boltzman distribution
-     random_number=((long double)rand()/RAND_MAX); //  random number [0;1]
-     px[ii]*=cosl(2*PI*random_number); // generating sign of momentum according to box-muller transformation
+     random_number=(((double)rand()+1)/((double)RAND_MAX+1)); //  random number (0;1]
+     px[ii]=sqrt(-2*K*T0*M*logl(random_number)); // generating initial momentum form maxwell-boltzman distribution
+     random_number=((double)rand()/RAND_MAX); //  random number [0;1]
+     px[ii]*=cos(2*PI*random_number); // generating sign of momentum according to box-muller transformation
 
-     random_number=(((long double)rand()+1)/((long double)RAND_MAX+1));
-     py[ii]=sqrtl(-2*K*T0*M*logl(random_number));
-     random_number=((long double)rand()/RAND_MAX);
-     py[ii]*=cosl(2*PI*random_number); 
+     random_number=(((double)rand()+1)/((double)RAND_MAX+1));
+     py[ii]=sqrt(-2*K*T0*M*logl(random_number));
+     random_number=((double)rand()/RAND_MAX);
+     py[ii]*=cos(2*PI*random_number); 
 
-     random_number=(((long double)rand()+1)/((long double)RAND_MAX+1)); 
-     pz[ii]=sqrtl(-2*K*T0*M*logl(random_number)); 
-     random_number=((long double)rand()/RAND_MAX);
-     pz[ii]*=cosl(2*PI*random_number); 
+     random_number=(((double)rand()+1)/((double)RAND_MAX+1)); 
+     pz[ii]=sqrt(-2*K*T0*M*logl(random_number)); 
+     random_number=((double)rand()/RAND_MAX);
+     pz[ii]*=cos(2*PI*random_number); 
 
 
    }
@@ -143,7 +143,7 @@ srand(time(NULL));
    rji=(x[jj]-x[ii])*(x[jj]-x[ii]);
    rji+=(y[jj]-y[ii])*(y[jj]-y[ii]);
    rji+=(z[jj]-z[ii])*(z[jj]-z[ii]);
-   rji=sqrtl(rji);
+   rji=sqrt(rji);
 
    V[jj]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
    V[ii]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
@@ -163,7 +163,7 @@ srand(time(NULL));
    rj=x[jj]*x[jj];
    rj+=y[jj]*y[jj];
    rj+=z[jj]*z[jj];
-   rj=sqrtl(rj);
+   rj=sqrt(rj);
 
    if(rj>=L){
 
@@ -176,12 +176,12 @@ srand(time(NULL));
 
    }
 
-   printf("AVERAGE MOMENTUM %Lf %Lf %Lf\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
-   printf("CALCULATED TEMPERATURE %Lf \n", temperature(px,py,pz,M,K,N) );
-   printf("CALCULATED KIN ENERGY %Lf \n", kineticEnergy(px,py,pz,M,N) );
-   printf("CALCULATED POT ENERGY %Lf \n", sumArray(V,N));
-   printf("CALCULATED TOTAL ENERGY %Lf \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
-   printf("CALCULATED PRESSURE %Lf \n", pressure(px,py,pz,L,N));
+   printf("AVERAGE MOMENTUM %lf %lf %lf\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
+   printf("CALCULATED TEMPERATURE %lf \n", temperature(px,py,pz,M,K,N) );
+   printf("CALCULATED KIN ENERGY %lf \n", kineticEnergy(px,py,pz,M,N) );
+   printf("CALCULATED POT ENERGY %lf \n", sumArray(V,N));
+   printf("CALCULATED TOTAL ENERGY %lf \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
+   printf("CALCULATED PRESSURE %lf \n", pressure(px,py,pz,L,N));
    getchar();
    
 
@@ -198,10 +198,10 @@ srand(time(NULL));
   z[ii]+=pz[ii]*TAU/M;
 }
 
-  memset(Fy,0,sizeof(long double)*N);
-  memset(Fx,0,sizeof(long double)*N);
-  memset(Fz,0,sizeof(long double)*N);
-  memset(V,0,sizeof(long double)*N);
+  memset(Fy,0,sizeof(double)*N);
+  memset(Fx,0,sizeof(double)*N);
+  memset(Fz,0,sizeof(double)*N);
+  memset(V,0,sizeof(double)*N);
 
    for(int jj=0;jj<N;jj++){
    for(int ii=jj;ii<N;ii++){
@@ -212,7 +212,7 @@ srand(time(NULL));
    rji=(x[jj]-x[ii])*(x[jj]-x[ii]);
    rji+=(y[jj]-y[ii])*(y[jj]-y[ii]);
    rji+=(z[jj]-z[ii])*(z[jj]-z[ii]);
-   rji=sqrtl(rji);
+   rji=sqrt(rji);
 
    V[jj]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
    V[ii]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
@@ -232,7 +232,7 @@ srand(time(NULL));
    rj=x[jj]*x[jj];
    rj+=y[jj]*y[jj];
    rj+=z[jj]*z[jj];
-   rj=sqrtl(rj);
+   rj=sqrt(rj);
 
    if(rj>=L){
 
@@ -261,7 +261,7 @@ if(ss<s_0){
 
 //OBLICZENIE NOWYCH PEDOW I NOWYCH POLOZEN
 if(ss==s_0){
-  printf("KONIEC TERMALIZACJI\n");
+printf("KONIEC TERMALIZACJI\n");
 printf("TIME [ps]\t");
 printf("TEMP. [K]\t");
 printf("E_KIN [kJ/mol]\t");
@@ -269,29 +269,29 @@ printf("E_POT [kJ/mol]\t");
 printf("E_TOT [kJ/mol]\t");
 printf("PRES. [kJ/mol/nm^3]\n");
 
-printf("%Lf\t",(ss-s_0)*TAU);
-printf("%Lf\t",(long double)(sumT/s_0));
-printf("%Lf\t",(long double)(sumK/s_0));
-printf("%Lf\t",(long double)(sumV/s_0));
-printf("%Lf\t",(long double)((sumT+sumV)/s_0));
-printf("%Lf\n",(long double)(sumP/s_0));
+printf("%lf\t",(ss-s_0)*TAU);
+printf("%lf\t",(double)(sumT/s_0));
+printf("%lf\t",(double)(sumK/s_0));
+printf("%lf\t",(double)(sumV/s_0));
+printf("%lf\t",(double)((sumT+sumV)/s_0));
+printf("%lf\n",(double)(sumP/s_0));
 }
 
 if(ss>s_0){
 
 if(ss%s_xyz==0){
    fprintf(output_xyz_file, "%d\n",N);
-   fprintf(output_xyz_file, "ss=%Lf\n",(ss-s_0)*TAU);
-  for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%Lf\t%Lf\t%Lf\n",i,x[i],y[i],z[i]);
+   fprintf(output_xyz_file, "ss=%lf\n",(ss-s_0)*TAU);
+  for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%lf\t%lf\t%lf\n",i,x[i],y[i],z[i]);
 }
 
 if(ss%s_out==0){
-  printf("%Lf\t ",(ss-s_0)*TAU);
-  printf("%Lf\t ",temperature(px,py,pz,M,K,N));
-  printf("%Lf\t",kineticEnergy(px,py,pz,M,N));
-  printf("%Lf\t",sumArray(V,N));
-  printf("%Lf\t",kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
-  printf("%Lf \n",pressure(px,py,pz,L,N));
+  printf("%lf\t ",(ss-s_0)*TAU);
+  printf("%lf\t ",temperature(px,py,pz,M,K,N));
+  printf("%lf\t",kineticEnergy(px,py,pz,M,N));
+  printf("%lf\t",sumArray(V,N));
+  printf("%lf\t",kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
+  printf("%lf \n",pressure(px,py,pz,L,N));
 
 }
   

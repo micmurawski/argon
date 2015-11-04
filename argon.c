@@ -16,14 +16,14 @@ inline void loadData(char *input_file_name,struct Parameters *p){
    }
  
    fscanf(input_file, "%d,",&p->n);
-   fscanf(input_file, "%Lf,",&p->m);
-   fscanf(input_file, "%Lf,",&p->eps);
-   fscanf(input_file, "%Lf,",&p->R);
-   fscanf(input_file, "%Lf,",&p->f);
-   fscanf(input_file, "%Lf,",&p->L);
-   fscanf(input_file, "%Lf,",&p->A);
-   fscanf(input_file, "%Lf,",&p->T);
-   fscanf(input_file, "%Lf,",&p->TAU);
+   fscanf(input_file, "%lf,",&p->m);
+   fscanf(input_file, "%lf,",&p->eps);
+   fscanf(input_file, "%lf,",&p->R);
+   fscanf(input_file, "%lf,",&p->f);
+   fscanf(input_file, "%lf,",&p->L);
+   fscanf(input_file, "%lf,",&p->A);
+   fscanf(input_file, "%lf,",&p->T);
+   fscanf(input_file, "%lf,",&p->TAU);
    fscanf(input_file, "%d,",&p->s_0);
    fscanf(input_file, "%d,",&p->s_d);
    fscanf(input_file, "%d,",&p->s_out);
@@ -33,27 +33,27 @@ inline void loadData(char *input_file_name,struct Parameters *p){
    }
 
 
-inline long double temperature(long double *px,long double *py,long double *pz, long double mass,long double k, int n){
-   long double T=0;
+inline double temperature(double *px,double *py,double *pz, double mass,double k, int n){
+   double T=0;
    for(int i=0;i<n;i++) T+=((px[i]*px[i])+(py[i]*py[i])+(pz[i]*pz[i]));
    T/=(3.0*k*n*mass);
    return T;
 }
 
-inline long double pressure(long double *px,long double *py,long double *pz, long double L, int N){
-   long double result=0;
-   for(int i=0;i<N;i++)result+=sqrtl((px[i]*px[i])+(py[i]*py[i])+(pz[i]*pz[i]));
+inline double pressure(double *px,double *py,double *pz, double L, int N){
+   double result=0;
+   for(int i=0;i<N;i++)result+=sqrt((px[i]*px[i])+(py[i]*py[i])+(pz[i]*pz[i]));
    return result/(4*3.1415926535*L*L);
 }
 
-inline long double kineticEnergy(long double *px,long double *py,long double *pz,long double mass, int N){
-   long double result=0;
+inline double kineticEnergy(double *px,double *py,double *pz,double mass, int N){
+   double result=0;
    for(int i=0;i<N;i++)result+=((px[i]*px[i])+(py[i]*py[i])+(pz[i]*pz[i]));
    return result/(2*mass);
 }
 
-inline long double sumArray(long double *v, int N){
-   long double result=0;
+inline double sumArray(double *v, int N){
+   double result=0;
    for(int i=0;i<N;i++)result+=v[i];
    return result;
 }
