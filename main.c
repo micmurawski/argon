@@ -35,13 +35,12 @@ FILE *output_xyz_file;
 
 struct Parameters parameters;
 loadData(INPUT,&parameters);
-double rji,rj;
 double apx,apy,apz;
-double sumT=0,sumK=0,sumV=0,sumP=0;
+double sumT=0,sumK=0,sumV=0,sumP=0,Vt,Pt,Kt,Tt;
 double random_number;
 int i0,i1,i2,i;
 const int N=n*n*n;
-
+//double px[N],py[N],pz[N],x[N],y[N],z[N],Fx[N],Fy[N],Fy[N],V[N];
 double* px = (double *)malloc(N*sizeof(double));
 double* py = (double *)malloc(N*sizeof(double));
 double* pz = (double *)malloc(N*sizeof(double));
@@ -134,61 +133,28 @@ srand(time(NULL));
     pz[ii]-=apz;
    }
 
-   for(int jj=0;jj<N;jj++){
-   for(int ii=jj;ii<N;ii++){
-   
-   // Rji=|Rj-Ri|
-    if(ii!=jj){
 
-   rji=(x[jj]-x[ii])*(x[jj]-x[ii]);
-   rji+=(y[jj]-y[ii])*(y[jj]-y[ii]);
-   rji+=(z[jj]-z[ii])*(z[jj]-z[ii]);
-   rji=sqrt(rji);
-
-   V[jj]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
-   V[ii]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
-   
-   Fx[jj]+=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
-   Fy[jj]+=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
-   Fz[jj]+=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
-
-   Fx[ii]-=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
-   Fy[ii]-=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
-   Fz[ii]-=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
-
-
-}
- }
-
-   rj=x[jj]*x[jj];
-   rj+=y[jj]*y[jj];
-   rj+=z[jj]*z[jj];
-   rj=sqrt(rj);
-
-   if(rj>=L){
-
-  V[jj]+=0.5*f*(rj-L)*(rj-L);
-   Fx[jj]+=f*(L-rj)*x[jj]/rj;
-   Fy[jj]+=f*(L-rj)*y[jj]/rj;
-   Fz[jj]+=f*(L-rj)*z[jj]/rj;
-
-   }
-
-   }
+  algorytm2(x,y,z,Fx,Fy,Fz,V,EPS,R,f,L,N);
 
    printf("AVERAGE MOMENTUM %lf %lf %lf\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
    printf("CALCULATED TEMPERATURE %lf \n", temperature(px,py,pz,M,K,N) );
-   printf("CALCULATED KIN ENERGY %lf \n", kineticEnergy(px,py,pz,M,N) );
+   printf("CALCULATED KIN ENERGY %lf \n", kineticEnergy(px,py,pz,M,N));
    printf("CALCULATED POT ENERGY %lf \n", sumArray(V,N));
    printf("CALCULATED TOTAL ENERGY %lf \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
    printf("CALCULATED PRESSURE %lf \n", pressure(px,py,pz,L,N));
    getchar();
-   
+   printf("TIME [ps]\t");
+printf("TEMP. [K]\t");
+printf("E_KIN [kJ/mol]\t");
+printf("E_POT [kJ/mol]\t");
+printf("E_TOT [kJ/mol]\t");
+printf("PRES. [kJ/mol/nm^3]\n");
 
    //ILOSC KROKOW
    for(int ss=0;ss<s_d+s_0+1;ss++){
 
   for(int ii=0;ii<N;ii++){
+
   px[ii]+=0.5*Fx[ii]*TAU;
   py[ii]+=0.5*Fy[ii]*TAU;
   pz[ii]+=0.5*Fz[ii]*TAU;
@@ -198,52 +164,9 @@ srand(time(NULL));
   z[ii]+=pz[ii]*TAU/M;
 }
 
-  memset(Fy,0,sizeof(double)*N);
-  memset(Fx,0,sizeof(double)*N);
-  memset(Fz,0,sizeof(double)*N);
-  memset(V,0,sizeof(double)*N);
-
-   for(int jj=0;jj<N;jj++){
-   for(int ii=jj;ii<N;ii++){
-   
-   // Rji=|Rj-Ri|
-    if(ii!=jj){
-
-   rji=(x[jj]-x[ii])*(x[jj]-x[ii]);
-   rji+=(y[jj]-y[ii])*(y[jj]-y[ii]);
-   rji+=(z[jj]-z[ii])*(z[jj]-z[ii]);
-   rji=sqrt(rji);
-
-   V[jj]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
-   V[ii]+=EPS*(powl(R/rji,12)-2*powl(R/rji,6));
-   
-   Fx[jj]+=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
-   Fy[jj]+=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
-   Fz[jj]+=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
-
-   Fx[ii]-=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(x[jj]-x[ii])/(rji*rji);
-   Fy[ii]-=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(y[jj]-y[ii])/(rji*rji);
-   Fz[ii]-=12*EPS*(powl(R/rji,12)-powl(R/rji,6))*(z[jj]-z[ii])/(rji*rji);
-
-
-}
- }
-
-   rj=x[jj]*x[jj];
-   rj+=y[jj]*y[jj];
-   rj+=z[jj]*z[jj];
-   rj=sqrt(rj);
-
-   if(rj>=L){
-
-   V[jj]+=0.5*f*(rj-L)*(rj-L);
-   Fx[jj]+=f*(L-rj)*x[jj]/rj;
-   Fy[jj]+=f*(L-rj)*y[jj]/rj;
-   Fz[jj]+=f*(L-rj)*z[jj]/rj;
-
-   }
-
-   }
+  algorytm2(x,y,z,Fx,Fy,Fz,V,EPS,R,f,L,N);
+   Vt=sumArray(V,N);
+Pt=pressure(px,py,pz,L,N);
 
    for(int ii=0;ii<N;ii++){
 
@@ -251,30 +174,19 @@ srand(time(NULL));
    py[ii]+=0.5*Fy[ii]*TAU;
    pz[ii]+=0.5*Fz[ii]*TAU;
 }
+Kt=kineticEnergy(px,py,pz,M,N);
+Tt=temperature(px,py,pz,M,K,N);
 
 if(ss<s_0){
-  sumT+=temperature(px,py,pz,M,K,N);
-  sumV+=sumArray(V,N);
-  sumK+=kineticEnergy(px,py,pz,M,N);
-  sumP+=pressure(px,py,pz,L,N);
+  //sumT+=temperature(px,py,pz,M,K,N);
+  //sumV+=sumArray(V,N);
+  //sumK+=kineticEnergy(px,py,pz,M,N);
+  //sumP+=pressure(px,py,pz,L,N);
 }
 
 //OBLICZENIE NOWYCH PEDOW I NOWYCH POLOZEN
-if(ss==s_0){
+if(ss==s_0 && s_0 > 0){
 printf("KONIEC TERMALIZACJI\n");
-printf("TIME [ps]\t");
-printf("TEMP. [K]\t");
-printf("E_KIN [kJ/mol]\t");
-printf("E_POT [kJ/mol]\t");
-printf("E_TOT [kJ/mol]\t");
-printf("PRES. [kJ/mol/nm^3]\n");
-
-printf("%lf\t",(ss-s_0)*TAU);
-printf("%lf\t",(double)(sumT/s_0));
-printf("%lf\t",(double)(sumK/s_0));
-printf("%lf\t",(double)(sumV/s_0));
-printf("%lf\t",(double)((sumT+sumV)/s_0));
-printf("%lf\n",(double)(sumP/s_0));
 }
 
 if(ss>s_0){
@@ -287,11 +199,11 @@ if(ss%s_xyz==0){
 
 if(ss%s_out==0){
   printf("%lf\t ",(ss-s_0)*TAU);
-  printf("%lf\t ",temperature(px,py,pz,M,K,N));
-  printf("%lf\t",kineticEnergy(px,py,pz,M,N));
-  printf("%lf\t",sumArray(V,N));
-  printf("%lf\t",kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
-  printf("%lf \n",pressure(px,py,pz,L,N));
+  printf("%lf\t ",Tt);
+  printf("%lf\t",Kt);
+  printf("%lf\t",Vt);
+  printf("%lf\t",Kt+Vt);
+  printf("%lf \n",Pt);
 
 }
   

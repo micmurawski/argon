@@ -25,5 +25,6 @@ extern double pressure(double *px,double *py,double *pz, double L, int N);
 extern double temperature(double *px,double *py,double *pz,double mass,double k, int n);
 extern double kineticEnergy(double *px,double *py,double *pz,double mass, int N);
 extern double sumArray(double *v,int N);
+extern void algorytm2(double *x,double *y,double *z,double *Fx,double *Fy,double *Fz,double *V,double EPS, double R, double f,double L,int N);
 
 #endif
