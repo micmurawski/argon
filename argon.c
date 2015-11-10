@@ -67,7 +67,7 @@ inline void algorytm2(double *x,double *y,double *z,double *Fx,double *Fy,double
   memset(Fz,0,sizeof(double)*N);
   memset(V,0,sizeof(double)*N);
 
-   for(int jj=0;jj<N;jj++){
+   for(int jj=1;jj<N;jj++){
 
    rj=x[jj]*x[jj];
    rj+=y[jj]*y[jj];
@@ -81,7 +81,7 @@ inline void algorytm2(double *x,double *y,double *z,double *Fx,double *Fy,double
    Fz[jj]+=f*(L-rj)*z[jj]/rj;
    }
 
-   for(int ii=jj;ii<N;ii++){
+   for(int ii=0;ii<jj;ii++){
    // Rji=|Rj-Ri|
     if(ii!=jj){
 
