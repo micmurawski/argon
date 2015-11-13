@@ -28,19 +28,18 @@
 
 int main(int argc, char *argv[]){
 
-//if(strcmp(argv[2],"-")!=0){
-//  FILE *output_file;
-//}
-FILE *output_xyz_file;
+FILE *output_file; // file containg t,H,V,T,P
+FILE *output_xyz_file; // file containg x y z coordinates
 
-struct Parameters parameters;
-loadData(INPUT,&parameters);
-double apx,apy,apz;
-double sumT=0,sumK=0,sumV=0,sumP=0,Vt,Pt,Kt,Tt;
-double random_number;
+struct Parameters parameters; // struct containg parameters
+loadData(INPUT,&parameters); // loading input parameters
+double apx,apy,apz; // variable containg avarega momentum
+double sumT=0,sumK=0,sumV=0,sumP=0,Vt,Pt,Kt,Tt; // variables containg sum of t,H,V,T,P and instantaneous H,V,T,P
+double random_number; 
 int i0,i1,i2,i;
-const int N=n*n*n;
+const int N=n*n*n; // number of all atoms
 
+// delcalation of arrays for momentum, force, potential and location
 double* px = (double *)malloc(N*sizeof(double));
 double* py = (double *)malloc(N*sizeof(double));
 double* pz = (double *)malloc(N*sizeof(double));
@@ -57,22 +56,32 @@ double* V = (double *)calloc(N,sizeof(double));
 
 srand(time(NULL));
    
-   printf("INPUT FILE: %s\n", INPUT);
-   printf("OUTPUT FILE:%s\n", OUTPUT_xyz);
-   printf("ATOM NUMBER:%d\n",N);
-   printf("ATOM MASS:  %lf u\n",M);
-   printf("EPS:        %lf KJ/mol\n",EPS);
-   printf("R:          %lf nm\n",R);
-   printf("f:          %lf\n",f);
-   printf("L:          %lf nm\n",L);
-   printf("A:          %lf nm\n",A);
-   printf("T:          %lf K\n",T0);
-   printf("TAU:        %lf ps\n",TAU);
-   printf("S_0:        %d\n",s_0);
-   printf("S_D:        %d\n",s_d);
-   printf("S_OUT:      %d\n",s_out);
-   printf("S_XYZ:      %d\n",s_xyz);
+  // printf("INPUT FILE: %s\n", INPUT);
+  // printf("OUTPUT FILE:%s\n", OUTPUT_xyz);
+  // printf("ATOM NUMBER:%d\n",N);
+  // printf("ATOM MASS:  %lf u\n",M);
+  // printf("EPS:        %lf KJ/mol\n",EPS);
+  // printf("R:          %lf nm\n",R);
+  // printf("f:          %lf\n",f);
+  // printf("L:          %lf nm\n",L);
+  // printf("A:          %lf nm\n",A);
+  // printf("T:          %lf K\n",T0);
+  // printf("TAU:        %lf ps\n",TAU);
+  // printf("S_0:        %d\n",s_0);
+  // printf("S_D:        %d\n",s_d);
+  // printf("S_OUT:      %d\n",s_out);
+  // printf("S_XYZ:      %d\n",s_xyz);
    
+
+if(strcmp(argv[2],"-")!=0) output_file=fopen(OUTPUT,"w");
+  output_xyz_file=fopen(OUTPUT_xyz,"w");
+
+    if( output_xyz_file == NULL)
+   {
+      perror("Error while opening the file.\n");
+      exit(EXIT_FAILURE);
+   }
+
 
 //generating initial positions of atoms
    for(i0=0;i0<n;i0++){
@@ -95,13 +104,8 @@ srand(time(NULL));
       }
             }
 
-   output_xyz_file=fopen(OUTPUT_xyz,"w");
 
-    if( output_xyz_file == NULL )
-   {
-      perror("Error while opening the file.\n");
-      exit(EXIT_FAILURE);
-   }
+            //generating intial momentum
 
    for(int ii=0;ii<N;ii++){
      
@@ -123,6 +127,7 @@ srand(time(NULL));
 
    }
 
+   // prowling average momentum
     apx=sumArray(px,N)/N;
     apy=sumArray(py,N)/N;
     apz=sumArray(pz,N)/N;
@@ -133,19 +138,25 @@ srand(time(NULL));
     pz[ii]-=apz;
    }
 
+   
 
+   // calculating inital forces and potential
   algorytm2(x,y,z,Fx,Fy,Fz,V,EPS,R,f,L,N);
 
-   printf("AVERAGE MOMENTUM %lf %lf %lf\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
+    if(strcmp(argv[2],"-")==0){
+   //printf("AVERAGE MOMENTUM %lf %lf %lf\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
    printf("CALCULATED TEMPERATURE %lf \n", temperature(px,py,pz,M,K,N) );
-   printf("CALCULATED KIN ENERGY %lf \n", kineticEnergy(px,py,pz,M,N));
-   printf("CALCULATED POT ENERGY %lf \n", sumArray(V,N));
-   printf("CALCULATED TOTAL ENERGY %lf \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
-   printf("CALCULATED PRESSURE %lf \n", pressure(px,py,pz,L,N));
-   getchar();
-   printf("TIME [ps]\tE_TOT [kJ/mol]\tE_POT [kJ/mol]\tTEMP. [K]\tPRES. [kJ/mol/nm^3]\n");
+   //printf("CALCULATED KIN ENERGY %lf \n", kineticEnergy(px,py,pz,M,N));
+   //printf("CALCULATED POT ENERGY %lf \n", sumArray(V,N));
+   //printf("CALCULATED TOTAL ENERGY %lf \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
+   //printf("CALCULATED PRESSURE %lf \n", pressure(px,py,pz,L,N));
+   //printf("TIME [ps]\tE_TOT [kJ/mol]\tE_POT [kJ/mol]\tTEMP. [K]\tPRES. [kJ/mol/nm^3]\n");
+    }else{
+      fprintf(output_file,"TIME [ps]\tE_TOT [kJ/mol]\tE_POT [kJ/mol]\tTEMP. [K]\tPRES. [kJ/mol/nm^3]\n");
+    }
+    //getchar();
 
-   //ILOSC KROKOW
+   // main loop 
    for(int ss=0;ss<s_d+s_0+1;ss++){
 
   for(int ii=0;ii<N;ii++){
@@ -180,11 +191,11 @@ if(ss>s_0) sumT+=Tt;
 
 //OBLICZENIE NOWYCH PEDOW I NOWYCH POLOZEN
 if(ss==s_0 && s_0 >0){
-printf("KONIEC TERMALIZACJI\n");
-//sumV=0;
-//sumP=0;
-//sumK=0;
-//sumT=0;
+//printf("KONIEC TERMALIZACJI\n");
+sumV=0;
+sumP=0;
+sumK=0;
+sumT=0;
 }
 
 if(ss>s_0){
@@ -195,14 +206,16 @@ if(ss%s_xyz==0){
   for(int i=0; i<N;i++)fprintf(output_xyz_file, "atom%d\t%lf\t%lf\t%lf\n",i,x[i],y[i],z[i]);
 }
 
-if(ss%s_out==0){
+if(ss%s_out==0 && strcmp(argv[2],"-")==0){
   printf("%lf\t%lf\t%lf\t%lf\t%lf\t\n",(ss-s_0)*TAU,Kt+Vt,Vt,Tt,Pt);
+}else if(ss%s_out==0){
+  fprintf(output_file,"%lf\t%lf\t%lf\t%lf\t%lf\t\n",(ss-s_0)*TAU,Kt+Vt,Vt,Tt,Pt);
 }
   
 
 }
 }
-    printf("AVERAGE\t%lf\t%lf\t%lf\t%lf\t\n",(sumK+sumV)/s_d,sumV/s_d,sumT/s_d,sumP/s_d);
+    printf("%f\t%lf\t%lf\t%lf\t%lf\t\n",s_d*TAU,(sumK+sumV)/s_d,sumV/s_d,sumT/s_d,sumP/s_d);
     free(Fx);
     free(Fy);
     free(Fz);
@@ -216,6 +229,7 @@ if(ss%s_out==0){
     free(z);
 
     fclose(output_xyz_file);
+    if(strcmp(argv[2],"-")!=0) fclose(output_file);
 
     return 0;
 
