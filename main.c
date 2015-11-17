@@ -128,33 +128,38 @@ if(strcmp(argv[2],"-")!=0) output_file=fopen(OUTPUT,"w");
    }
 
    // prowling average momentum
-    apx=sumArray(px,N)/N;
-    apy=sumArray(py,N)/N;
-    apz=sumArray(pz,N)/N;
+    apx=sumArray(px,N);
+    apy=sumArray(py,N);
+    apz=sumArray(pz,N);
+    Tt=temperature(px,py,pz,M,K,N);
 
    for(int ii=0;ii<N;ii++){
-    px[ii]-=apx;
-    py[ii]-=apy;
-    pz[ii]-=apz;
-   }
+    px[ii]-=apx/N;
+    py[ii]-=apy/N;
+    pz[ii]-=apz/N;
+    if(T0!=0){
+      px[ii]*=sqrt(T0)/sqrt(Tt);
+      py[ii]*=sqrt(T0)/sqrt(Tt);
+      pz[ii]*=sqrt(T0)/sqrt(Tt);
 
-   
+    }
+   }
 
    // calculating inital forces and potential
   algorytm2(x,y,z,Fx,Fy,Fz,V,EPS,R,f,L,N);
 
     if(strcmp(argv[2],"-")==0){
    //printf("AVERAGE MOMENTUM %lf %lf %lf\n",sumArray(px,N)/N,sumArray(py,N)/N,sumArray(pz,N)/N);
-   printf("CALCULATED TEMPERATURE %lf \n", temperature(px,py,pz,M,K,N) );
+   //printf("CALCULATED TEMPERATURE %lf \n", temperature(px,py,pz,M,K,N) );
    //printf("CALCULATED KIN ENERGY %lf \n", kineticEnergy(px,py,pz,M,N));
    //printf("CALCULATED POT ENERGY %lf \n", sumArray(V,N));
    //printf("CALCULATED TOTAL ENERGY %lf \n", kineticEnergy(px,py,pz,M,N)+sumArray(V,N));
    //printf("CALCULATED PRESSURE %lf \n", pressure(px,py,pz,L,N));
-   //printf("TIME [ps]\tE_TOT [kJ/mol]\tE_POT [kJ/mol]\tTEMP. [K]\tPRES. [kJ/mol/nm^3]\n");
+   printf("TIME [ps]\tE_TOT [kJ/mol]\tE_POT [kJ/mol]\tTEMP. [K]\tPRES. [kJ/mol/nm^3]\n");
     }else{
       fprintf(output_file,"TIME [ps]\tE_TOT [kJ/mol]\tE_POT [kJ/mol]\tTEMP. [K]\tPRES. [kJ/mol/nm^3]\n");
     }
-    //getchar();
+ 	//getchar();
 
    // main loop 
    for(int ss=0;ss<s_d+s_0+1;ss++){
@@ -223,7 +228,6 @@ if(ss%s_out==0 && strcmp(argv[2],"-")==0){
     free(px);
     free(py);
     free(pz);
-
     free(x);
     free(y);
     free(z);
